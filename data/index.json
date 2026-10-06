@@ -1,0 +1,726 @@
+{
+ "source": "Robbins & Kumar Pathologic Basis of Disease, 11th ed. — text dump supplied by the owner (personal study use)",
+ "format": "robbins-pages-v0",
+ "quality": "text only: reading order of two-column pages is NOT repaired; tables/figures are not structured",
+ "pdf_page_to_book_page_offset": 16,
+ "chapters": [
+  {
+   "number": 1,
+   "title": "The Cell as a Unit of Health and Disease",
+   "file": "chapters/ch01.json",
+   "pdf_pages": [
+    17,
+    44
+   ],
+   "book_pages": [
+    1,
+    28
+   ],
+   "page_count": 28,
+   "characters": 141196,
+   "tables": [
+    "1.1"
+   ]
+  },
+  {
+   "number": 2,
+   "title": "Cell Injury, Cell Death, and Adaptations",
+   "file": "chapters/ch02.json",
+   "pdf_pages": [
+    45,
+    79
+   ],
+   "book_pages": [
+    29,
+    63
+   ],
+   "page_count": 35,
+   "characters": 179154,
+   "tables": [
+    "2.1",
+    "2.2",
+    "2.3"
+   ]
+  },
+  {
+   "number": 3,
+   "title": "Inflammation and Repair",
+   "file": "chapters/ch03.json",
+   "pdf_pages": [
+    80,
+    115
+   ],
+   "book_pages": [
+    64,
+    99
+   ],
+   "page_count": 36,
+   "characters": 189699,
+   "tables": [
+    "3.1",
+    "3.2",
+    "3.3",
+    "3.4",
+    "3.5",
+    "3.6",
+    "3.7",
+    "3.8",
+    "3.9",
+    "3.10",
+    "3.11"
+   ]
+  },
+  {
+   "number": 4,
+   "title": "Hemodynamic Disorders, Thromboembolic Disease, and Shock",
+   "file": "chapters/ch04.json",
+   "pdf_pages": [
+    116,
+    137
+   ],
+   "book_pages": [
+    100,
+    121
+   ],
+   "page_count": 22,
+   "characters": 119577,
+   "tables": [
+    "4.1",
+    "4.2",
+    "4.3"
+   ]
+  },
+  {
+   "number": 5,
+   "title": "Genes and Human Diseases",
+   "file": "chapters/ch05.json",
+   "pdf_pages": [
+    138,
+    182
+   ],
+   "book_pages": [
+    122,
+    166
+   ],
+   "page_count": 45,
+   "characters": 236998,
+   "tables": [
+    "5.1",
+    "5.2",
+    "5.3",
+    "5.4",
+    "5.5",
+    "5.6",
+    "5.7",
+    "5.8"
+   ]
+  },
+  {
+   "number": 6,
+   "title": "Diseases of the Immune System",
+   "file": "chapters/ch06.json",
+   "pdf_pages": [
+    183,
+    251
+   ],
+   "book_pages": [
+    167,
+    235
+   ],
+   "page_count": 69,
+   "characters": 383421,
+   "tables": [
+    "6.1",
+    "6.2",
+    "6.3",
+    "6.4",
+    "6.5",
+    "6.6",
+    "6.7",
+    "6.8",
+    "6.10",
+    "6.11",
+    "6.12",
+    "6.13",
+    "6.14",
+    "6.15",
+    "6.16",
+    "6.17"
+   ]
+  },
+  {
+   "number": 7,
+   "title": "Neoplasia",
+   "file": "chapters/ch07.json",
+   "pdf_pages": [
+    252,
+    318
+   ],
+   "book_pages": [
+    236,
+    302
+   ],
+   "page_count": 67,
+   "characters": 359354,
+   "tables": [
+    "7.1",
+    "7.2",
+    "7.3",
+    "7.4",
+    "7.5",
+    "7.6",
+    "7.7",
+    "7.8",
+    "7.9",
+    "7.10",
+    "7.11",
+    "7.12"
+   ]
+  },
+  {
+   "number": 8,
+   "title": "Infectious Diseases",
+   "file": "chapters/ch08.json",
+   "pdf_pages": [
+    319,
+    382
+   ],
+   "book_pages": [
+    303,
+    366
+   ],
+   "page_count": 64,
+   "characters": 359069,
+   "tables": [
+    "8.1",
+    "8.2",
+    "8.3",
+    "8.4",
+    "8.5",
+    "8.6",
+    "8.7"
+   ]
+  },
+  {
+   "number": 9,
+   "title": "Environmental and Nutritional Diseases",
+   "file": "chapters/ch09.json",
+   "pdf_pages": [
+    383,
+    426
+   ],
+   "book_pages": [
+    367,
+    410
+   ],
+   "page_count": 44,
+   "characters": 247482,
+   "tables": [
+    "9.1",
+    "9.2",
+    "9.3",
+    "9.4",
+    "9.5",
+    "9.6",
+    "9.7",
+    "9.8",
+    "9.9",
+    "9.10"
+   ]
+  },
+  {
+   "number": 10,
+   "title": "Diseases of Infancy and Childhood",
+   "file": "chapters/ch10.json",
+   "pdf_pages": [
+    427,
+    456
+   ],
+   "book_pages": [
+    411,
+    440
+   ],
+   "page_count": 30,
+   "characters": 162616,
+   "tables": [
+    "10.1",
+    "10.2",
+    "10.3",
+    "10.4",
+    "10.5",
+    "10.6",
+    "10.7",
+    "10.8"
+   ]
+  },
+  {
+   "number": 11,
+   "title": "Blood Vessels",
+   "file": "chapters/ch11.json",
+   "pdf_pages": [
+    457,
+    494
+   ],
+   "book_pages": [
+    441,
+    478
+   ],
+   "page_count": 38,
+   "characters": 188186,
+   "tables": [
+    "11.1",
+    "11.2",
+    "11.3",
+    "11.4",
+    "11.5"
+   ]
+  },
+  {
+   "number": 12,
+   "title": "The Heart",
+   "file": "chapters/ch12.json",
+   "pdf_pages": [
+    495,
+    545
+   ],
+   "book_pages": [
+    479,
+    529
+   ],
+   "page_count": 51,
+   "characters": 262178,
+   "tables": [
+    "12.1",
+    "12.2",
+    "12.3",
+    "12.4",
+    "12.5",
+    "12.6",
+    "12.7",
+    "12.8",
+    "12.9",
+    "12.10",
+    "12.11",
+    "12.12",
+    "12.13"
+   ]
+  },
+  {
+   "number": 13,
+   "title": "Diseases of White Blood Cells, Lymph Nodes, Spleen, and Thymus",
+   "file": "chapters/ch13.json",
+   "pdf_pages": [
+    546,
+    592
+   ],
+   "book_pages": [
+    530,
+    576
+   ],
+   "page_count": 47,
+   "characters": 260498,
+   "tables": [
+    "13.1",
+    "13.2",
+    "13.3",
+    "13.4",
+    "13.5",
+    "13.6",
+    "13.7",
+    "13.8",
+    "13.9",
+    "13.10",
+    "13.11",
+    "13.12"
+   ]
+  },
+  {
+   "number": 14,
+   "title": "Red Blood Cell and Bleeding Disorders",
+   "file": "chapters/ch14.json",
+   "pdf_pages": [
+    593,
+    627
+   ],
+   "book_pages": [
+    577,
+    611
+   ],
+   "page_count": 35,
+   "characters": 200790,
+   "tables": [
+    "14.1",
+    "14.2",
+    "14.3",
+    "14.4",
+    "14.5",
+    "14.6",
+    "14.7",
+    "14.8",
+    "14.9",
+    "14.10"
+   ]
+  },
+  {
+   "number": 15,
+   "title": "The Lung",
+   "file": "chapters/ch15.json",
+   "pdf_pages": [
+    628,
+    679
+   ],
+   "book_pages": [
+    612,
+    663
+   ],
+   "page_count": 52,
+   "characters": 269008,
+   "tables": [
+    "15.1",
+    "15.2",
+    "15.3",
+    "15.4",
+    "15.5",
+    "15.6",
+    "15.7",
+    "15.8",
+    "15.9",
+    "15.10",
+    "15.11",
+    "15.12"
+   ]
+  },
+  {
+   "number": 16,
+   "title": "Head and Neck",
+   "file": "chapters/ch16.json",
+   "pdf_pages": [
+    680,
+    699
+   ],
+   "book_pages": [
+    664,
+    683
+   ],
+   "page_count": 20,
+   "characters": 93036,
+   "tables": [
+    "16.1",
+    "16.2",
+    "16.3",
+    "16.4",
+    "16.5"
+   ]
+  },
+  {
+   "number": 17,
+   "title": "The Gastrointestinal Tract",
+   "file": "chapters/ch17.json",
+   "pdf_pages": [
+    700,
+    763
+   ],
+   "book_pages": [
+    684,
+    747
+   ],
+   "page_count": 64,
+   "characters": 331104,
+   "tables": [
+    "17.1",
+    "17.2",
+    "17.3",
+    "17.4",
+    "17.5",
+    "17.6",
+    "17.7",
+    "17.8",
+    "17.9",
+    "17.10",
+    "17.11",
+    "17.12"
+   ]
+  },
+  {
+   "number": 18,
+   "title": "Liver and Gallbladder",
+   "file": "chapters/ch18.json",
+   "pdf_pages": [
+    764,
+    815
+   ],
+   "book_pages": [
+    748,
+    799
+   ],
+   "page_count": 52,
+   "characters": 258191,
+   "tables": [
+    "18.1",
+    "18.2",
+    "18.3",
+    "18.4",
+    "18.5",
+    "18.6",
+    "18.7",
+    "18.8",
+    "18.9",
+    "18.10",
+    "18.11"
+   ]
+  },
+  {
+   "number": 19,
+   "title": "The Pancreas",
+   "file": "chapters/ch19.json",
+   "pdf_pages": [
+    816,
+    828
+   ],
+   "book_pages": [
+    800,
+    812
+   ],
+   "page_count": 13,
+   "characters": 60830,
+   "tables": [
+    "19.1",
+    "19.2",
+    "19.3",
+    "19.4"
+   ]
+  },
+  {
+   "number": 20,
+   "title": "The Kidney",
+   "file": "chapters/ch20.json",
+   "pdf_pages": [
+    829,
+    882
+   ],
+   "book_pages": [
+    813,
+    866
+   ],
+   "page_count": 54,
+   "characters": 266295,
+   "tables": [
+    "20.1",
+    "20.2",
+    "20.3",
+    "20.4",
+    "20.5",
+    "20.6",
+    "20.7",
+    "20.8",
+    "20.9",
+    "20.10",
+    "20.11",
+    "20.12"
+   ]
+  },
+  {
+   "number": 21,
+   "title": "The Lower Urinary Tract and Male Genital System",
+   "file": "chapters/ch21.json",
+   "pdf_pages": [
+    883,
+    910
+   ],
+   "book_pages": [
+    867,
+    894
+   ],
+   "page_count": 28,
+   "characters": 135231,
+   "tables": [
+    "21.1",
+    "21.2",
+    "21.3",
+    "21.4",
+    "21.5",
+    "21.6",
+    "21.7",
+    "21.8"
+   ]
+  },
+  {
+   "number": 22,
+   "title": "The Female Genital Tract",
+   "file": "chapters/ch22.json",
+   "pdf_pages": [
+    911,
+    959
+   ],
+   "book_pages": [
+    895,
+    943
+   ],
+   "page_count": 49,
+   "characters": 219034,
+   "tables": [
+    "22.1",
+    "22.2",
+    "22.3",
+    "22.4"
+   ]
+  },
+  {
+   "number": 23,
+   "title": "The Breast",
+   "file": "chapters/ch23.json",
+   "pdf_pages": [
+    960,
+    985
+   ],
+   "book_pages": [
+    944,
+    969
+   ],
+   "page_count": 26,
+   "characters": 122987,
+   "tables": [
+    "23.1",
+    "23.2",
+    "23.3",
+    "23.4",
+    "23.5",
+    "23.6",
+    "23.7"
+   ]
+  },
+  {
+   "number": 24,
+   "title": "The Endocrine System",
+   "file": "chapters/ch24.json",
+   "pdf_pages": [
+    986,
+    1043
+   ],
+   "book_pages": [
+    970,
+    1027
+   ],
+   "page_count": 58,
+   "characters": 319422,
+   "tables": [
+    "24.1",
+    "24.2",
+    "24.3",
+    "24.4",
+    "24.5",
+    "24.6",
+    "24.7",
+    "24.8",
+    "24.9",
+    "24.10"
+   ]
+  },
+  {
+   "number": 25,
+   "title": "The Skin",
+   "file": "chapters/ch25.json",
+   "pdf_pages": [
+    1044,
+    1078
+   ],
+   "book_pages": [
+    1028,
+    1062
+   ],
+   "page_count": 35,
+   "characters": 148310,
+   "tables": [
+    "25.1",
+    "25.2",
+    "25.3"
+   ]
+  },
+  {
+   "number": 26,
+   "title": "Bones, Joints, and Soft Tissue Tumors",
+   "file": "chapters/ch26.json",
+   "pdf_pages": [
+    1079,
+    1121
+   ],
+   "book_pages": [
+    1063,
+    1105
+   ],
+   "page_count": 43,
+   "characters": 187285,
+   "tables": [
+    "26.1",
+    "26.2",
+    "26.3",
+    "26.4",
+    "26.5",
+    "26.6",
+    "26.7",
+    "26.8"
+   ]
+  },
+  {
+   "number": 27,
+   "title": "Peripheral Nerves and Skeletal Muscles",
+   "file": "chapters/ch27.json",
+   "pdf_pages": [
+    1122,
+    1144
+   ],
+   "book_pages": [
+    1106,
+    1128
+   ],
+   "page_count": 23,
+   "characters": 125342,
+   "tables": [
+    "27.1",
+    "27.2",
+    "27.3"
+   ]
+  },
+  {
+   "number": 28,
+   "title": "The Central Nervous System",
+   "file": "chapters/ch28.json",
+   "pdf_pages": [
+    1145,
+    1202
+   ],
+   "book_pages": [
+    1129,
+    1186
+   ],
+   "page_count": 58,
+   "characters": 304527,
+   "tables": [
+    "28.1",
+    "28.2",
+    "28.3",
+    "28.4",
+    "28.5"
+   ]
+  },
+  {
+   "number": 29,
+   "title": "The Eye",
+   "file": "chapters/ch29.json",
+   "pdf_pages": [
+    1203,
+    1225
+   ],
+   "book_pages": [
+    1187,
+    1209
+   ],
+   "page_count": 23,
+   "characters": 100832,
+   "tables": []
+  }
+ ],
+ "front_matter_file": "front_matter.json",
+ "back_matter_file": "back_matter.json",
+ "cleaning_pass": "v1 (adds second-pass Greek-letter / ion-sign repairs; see cleaning_report.md)"
+}
