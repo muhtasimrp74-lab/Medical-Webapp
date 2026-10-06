@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.local
+# Book text is copyrighted: never commit it to a public repo
+public/data/
+public/pages/*.webp
