@@ -14,9 +14,7 @@ npm run build && npm run preview
 Stack: Vite · React · TypeScript · react-router (HashRouter) · idb · MiniSearch · vite-plugin-pwa (Workbox).
 HashRouter + relative base means it deploys to any static host or sub-path (a GitHub Pages workflow is included).
 
-> **Data is not in this repo.** `public/data/` (the Robbins JSON) and `public/pages/*.webp` are gitignored because the text is copyrighted.
-> Copy `Robbins_World_Class/{index,front_matter,back_matter}.json` and `chapters/` into `public/data/` before `npm run dev`/`build`.
-> To commit or deploy the data, make the repository private first (and remove the two ignore lines).
+> **Copyright:** `public/data/` contains the book text and is committed here for testing. Make the repository private (or remove the data) if you do not hold the rights to publish it.
 
 ## Data
 `public/data/` holds the JSON unchanged (`index.json`, `front_matter.json`, `back_matter.json`, `chapters/chNN.json`).
