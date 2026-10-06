@@ -27,8 +27,12 @@ Pure, tested, never modifies the data. Each rendered slice keeps `(paragraph ind
 - running headers (`84 CHAPTER 3 …` / `CHAPTER 3 … 85`, also mid-page) are dropped; the page marker comes from `book_page`
 - `•` → bullets, `1.` → numbered items, `Fig.` → figure cards, `TABLE x.y` → caption + real HTML table (from `tables_extracted`, placed after its caption)
 - short unpunctuated lines → headings (ALL-CAPS = level 2, Title Case = level 3); `MORPHOLOGY` / `KEY CONCEPTS` → side labels; fragments that also appear in `figure_text` are not headings
-- wrapped lines that start lower-case / with `-` are re-joined; a paragraph continuing from the previous page is flagged so it is not indented
-- chapter opener: number + title become a hero; the two-column contents lines go into a collapsed "Chapter contents"
+- pages are stitched into **one continuous flow**: a paragraph or bullet that breaks across a page is completed as one paragraph (page anchors sit inside it, margin tags show the page on wide screens)
+- figure/table boxes are **held back until the paragraph they landed in has ended**, so they never split a sentence
+- `Fig. 3.4`, `Table 3.2`, `Chapter 5`, `Chapters 3 and 4` become links (same chapter: scroll + flash; other chapter: opens it at the figure/table)
+- exam emphasis (`src/lib/lexicon.ts`): bold = high-yield terms (first mention per page, max 4/page, none on chapter intros); italic = organisms, gene symbols, Latin phrases. Edit the lists freely
+- wrapped lines that start lower-case / with `-` are re-joined
+- chapter opener: number + title become a hero; the extracted two-column contents lines and figure-label fragments are dropped
 
 ## Features (Phase 1)
 Library by unit with per-chapter progress · continue / recent / bookmarks · continuous reader with outline, page margin

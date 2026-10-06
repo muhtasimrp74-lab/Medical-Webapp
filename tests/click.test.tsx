@@ -18,6 +18,6 @@ it('Library → click chapter → reader appears', async () => {
   render(<App />);
   const link = await screen.findByText('Inflammation and Repair', {}, { timeout: 5000 });
   fireEvent.click(link.closest('a')!);
-  await waitFor(() => expect(document.querySelectorAll('section.page').length).toBeGreaterThan(0), { timeout: 8000 });
-  console.log('HASH', window.location.hash, 'pages', document.querySelectorAll('section.page').length);
+  await waitFor(() => expect(document.querySelectorAll('span.pg-anchor[data-page]').length).toBeGreaterThan(0), { timeout: 8000 });
+  console.log('HASH', window.location.hash, 'pages', document.querySelectorAll('span.pg-anchor[data-page]').length);
 }, 20000);

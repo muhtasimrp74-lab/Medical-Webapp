@@ -3,11 +3,12 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { loadCatalog, loadChapter, resetOfflineCache } from '../lib/data';
 import { getProgress, listAnnotations, listBookmarks, putAnnotation, deleteAnnotation, toggleBookmark, uid, updateProgress, useLive, requestPersistence } from '../lib/db';
 import { useSettings } from '../lib/settings';
-import { buildFindRegex } from '../lib/segments';
+import { buildFindRegex, resolveRef } from '../lib/segments';
+import { chapterIdFromNumber } from '../lib/units';
 import { selectionToSegments } from '../lib/anchors';
-import type { Annotation, CatalogEntry, HlColor, ParsedChapter, ParsedPage } from '../lib/types';
+import type { Annotation, CatalogEntry, HlColor, ParsedChapter } from '../lib/types';
 import { HL_COLORS, type ThemeName } from '../lib/types';
-import { PageSection, ReaderCtx } from '../components/Blocks';
+import { BlockRow, ReaderCtx, anchorsOf, blockParts } from '../components/Blocks';
 import { Sidebar, type SideTab } from '../components/Sidebar';
 import { AnnoEditor, SelectionBar, type EditorState } from '../components/Annotate';
 import { ReaderSettings } from '../components/ReaderSettings';
@@ -63,6 +64,8 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [img, setImg] = useState<{ pdfPage: number; label: string } | null>(null);
   const [setOpen, setSetOpen] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  useEffect(() => { if (!notice) return; const t = setTimeout(() => setNotice(null), 3500); return () => clearTimeout(t); }, [notice]);
   const col = useRef<HTMLDivElement>(null);
   const gotoRef = useRef<HTMLInputElement>(null);
   const restored = useRef(false);
@@ -70,9 +73,11 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
   const findRe = useMemo(() => buildFindRegex(q), [q]);
   const pages = chapter.pages;
   const bmSet = useMemo(() => new Set(bookmarks.map((b) => b.pageId)), [bookmarks]);
-  const annosByPage = useMemo(() => {
+  const pageMap = useMemo(() => new Map(pages.map((p) => [p.id, p])), [pages]);
+  const pageIdx = useMemo(() => new Map(pages.map((p, i) => [p.id, i])), [pages]);
+  const annosByPart = useMemo(() => {
     const m = new Map<string, Annotation[]>();
-    annos.forEach((a) => new Set(a.segments.map((s) => s.pageId)).forEach((p) => m.set(p, [...(m.get(p) ?? []), a])));
+    annos.forEach((a) => a.segments.forEach((s) => { const k = `${s.pageId}:${s.pi}`; const l = m.get(k) ?? []; if (!l.includes(a)) l.push(a); m.set(k, l); }));
     return m;
   }, [annos]);
 
@@ -80,22 +85,39 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
   const scrollEl = (el: HTMLElement | null, block: ScrollLogicalPosition = 'start') => el?.scrollIntoView({ block, behavior: 'auto' });
   const jumpPage = useCallback((id: string) => scrollEl(document.getElementById(`pg-${id}`)), []);
   const jumpBlock = useCallback((key: string) => scrollEl(document.getElementById(`b-${key}`)), []);
+  const flash = (el: HTMLElement | null) => { if (!el) return; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
+  const goRef = useCallback((ref: string) => {
+    const { chapter, domId } = resolveRef(ref);
+    if (chapter !== entry.number) { nav(`/read/${chapterIdFromNumber(chapter)}${domId ? `?ref=${domId}` : ''}`); return; }
+    const el = domId ? document.getElementById(domId) : null;
+    if (el) { el.scrollIntoView({ block: 'center' }); flash(el); }
+    else if (!domId) window.scrollTo({ top: 0 });
+    else setNotice(`${domId.startsWith('fig') ? 'Figure' : 'Table'} ${domId.slice(4)} has no caption in the extracted text.`);
+  }, [entry.number, nav]);
   const jumpAnno = useCallback((id: string) => { const el = document.querySelector<HTMLElement>(`[data-anno="${id}"]`); scrollEl(el, 'center'); el?.focus({ preventScroll: true }); }, []);
 
-  /* ── restore position (URL ?pg= wins, else saved progress) ── */
+  /* ── restore position (URL ?ref= / ?pg= win, else saved progress) ── */
   useLayoutEffect(() => {
     history.scrollRestoration = 'manual';
-    const pg = sp.get('pg');
-    if (pg) {
-      const sec = document.getElementById(`pg-${pg}`);
-      const hit = sec?.querySelector<HTMLElement>('mark.find');
-      if (hit) scrollEl(hit, 'center'); else scrollEl(sec);
-      restored.current = true;
-      const n = new URLSearchParams(sp); n.delete('pg'); setSp(n, { replace: true });
+    const strip = (k: string) => { const n = new URLSearchParams(sp); n.delete(k); setSp(n, { replace: true }); };
+    const ref = sp.get('ref'); const pg = sp.get('pg');
+    const refEl = ref ? document.getElementById(ref) : null;
+    if (ref && !refEl) setNotice(`${ref.startsWith('fig') ? 'Figure' : 'Table'} ${ref.slice(4)} has no caption in the extracted text.`);
+    if (refEl) { refEl.scrollIntoView({ block: 'center' }); flash(refEl); restored.current = true; strip('ref'); }
+    else if (pg) {
+      const a = document.getElementById(`pg-${pg}`);
+      const hit = document.querySelector<HTMLElement>('mark.find');
+      const near = hit && a && Math.abs(hit.getBoundingClientRect().top - a.getBoundingClientRect().top) < window.innerHeight * 1.5;
+      if (near) scrollEl(hit, 'center'); else scrollEl(a);
+      restored.current = true; strip('pg');
     } else {
       getProgress(entry.id).then((p) => {
-        const sec = p?.pageId ? document.getElementById(`pg-${p.pageId}`) : null;
-        if (sec) window.scrollTo({ top: sec.getBoundingClientRect().top + window.scrollY - BAR_H - 8 + (p?.frac ?? 0) * sec.offsetHeight });
+        const a = p?.pageId ? document.getElementById(`pg-${p.pageId}`) : null;
+        if (a) {
+          const nxt = document.getElementById(`pg-${pages[(p?.pageIdx ?? 0) + 1]?.id}`);
+          const h = Math.max(1, (nxt ? nxt.getBoundingClientRect().top : document.documentElement.scrollHeight) - a.getBoundingClientRect().top);
+          window.scrollTo({ top: a.getBoundingClientRect().top + window.scrollY - BAR_H - 8 + (p?.frac ?? 0) * h });
+        }
         restored.current = true;
       }).catch(() => { restored.current = true; });
     }
@@ -106,17 +128,20 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
   /* ── scroll spy + save position ── */
   useEffect(() => {
     const el = col.current!;
-    let pageTops: number[] = [], heads: { key: string; top: number }[] = [], raf = 0, timer = 0, ci = -1, ch: string | null = null;
+    let pageTops: { i: number; top: number }[] = [], heads: { key: string; top: number }[] = [], raf = 0, timer = 0, ci = -1, ch: string | null = null;
     const measure = () => {
-      pageTops = Array.from(el.querySelectorAll<HTMLElement>('section.page')).map((s) => s.getBoundingClientRect().top + window.scrollY);
+      pageTops = Array.from(el.querySelectorAll<HTMLElement>('.pg-anchor[data-page]'))
+        .map((a) => ({ i: pageIdx.get(a.dataset.page!) ?? 0, top: a.getBoundingClientRect().top + window.scrollY }))
+        .sort((x, y) => x.top - y.top);
       heads = Array.from(el.querySelectorAll<HTMLElement>('[data-h]')).map((h) => ({ key: h.closest('.blk')!.id.slice(2), top: h.getBoundingClientRect().top + window.scrollY }));
     };
     const pos = () => {
       const y = window.scrollY + BAR_H + 24;
-      let i = 0; for (let k = 0; k < pageTops.length && pageTops[k] <= y; k++) i = k;
-      let h: string | null = null; for (const x of heads) { if (x.top <= y) h = x.key; else break; }
-      const height = Math.max(1, (pageTops[i + 1] ?? document.documentElement.scrollHeight) - pageTops[i]);
-      return { i, h, frac: Math.max(0, Math.min(1, (window.scrollY + BAR_H + 8 - pageTops[i]) / height)) };
+      let k = 0; for (let j = 0; j < pageTops.length && pageTops[j].top <= y; j++) k = j;
+      const cur = pageTops[k]; let h: string | null = null;
+      for (const x of heads) { if (x.top <= y) h = x.key; else break; }
+      const height = Math.max(1, (pageTops[k + 1]?.top ?? document.documentElement.scrollHeight) - (cur?.top ?? 0));
+      return { i: cur?.i ?? 0, h, frac: Math.max(0, Math.min(1, (window.scrollY + BAR_H + 8 - (cur?.top ?? 0)) / height)) };
     };
     const save = () => {
       if (!restored.current) return;
@@ -139,7 +164,7 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
     const flush = () => { if (document.visibilityState === 'hidden') save(); };
     document.addEventListener('visibilitychange', flush);
     return () => { window.removeEventListener('scroll', onScroll); document.removeEventListener('visibilitychange', flush); ro.disconnect(); window.clearTimeout(timer); cancelAnimationFrame(raf); };
-  }, [entry.id, pages]);
+  }, [entry.id, pages, pageIdx]);
 
   /* page counts as read after 2.5 s of dwell */
   useEffect(() => {
@@ -179,8 +204,10 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
     const a = annos.find((x) => x.id === id); if (a) setEditor({ anno: a, isNew: false, rect: el.getBoundingClientRect(), opener: el });
   }, [annos]);
   const closeEditor = () => { editor?.opener?.focus(); setEditor(null); };
-  const toggleBm = useCallback((p: ParsedPage) => { toggleBookmark({ chapterId: entry.id, pageId: p.id, bookPage: p.bookPage, pdfPage: p.pdfPage, label: p.label }); }, [entry.id]);
-  const actions = useMemo(() => ({ openAnno, toggleBookmark: toggleBm, viewOriginal: (p: ParsedPage) => setImg({ pdfPage: p.pdfPage, label: p.label }) }), [openAnno, toggleBm]);
+  const toggleBm = useCallback((pageId: string) => {
+    const p = pageMap.get(pageId); if (p) toggleBookmark({ chapterId: entry.id, pageId: p.id, bookPage: p.bookPage, pdfPage: p.pdfPage, label: p.label });
+  }, [entry.id, pageMap]);
+  const actions = useMemo(() => ({ pages: pageMap, bookmarked: bmSet, openAnno, toggleBookmark: toggleBm, viewOriginal: (id: string) => { const p = pageMap.get(id); if (p) setImg({ pdfPage: p.pdfPage, label: p.label }); }, goRef }), [pageMap, bmSet, openAnno, toggleBm, goRef]);
 
   /* ── keyboard ── */
   useEffect(() => {
@@ -195,7 +222,7 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
         case ']': go(1); break; case '[': go(-1); break;
         case 'o': setSideOpen((v) => !v); break;
         case 'g': e.preventDefault(); setSideOpen(true); setTab('outline'); setTimeout(() => gotoRef.current?.focus(), 30); break;
-        case 'b': toggleBm(page); break;
+        case 'b': toggleBm(page.id); break;
         case 'f': update({ focus: !settings.focus }); break;
         case 't': update({ theme: THEME_ORDER[(THEME_ORDER.indexOf(settings.theme) + 1) % 3] }); break;
         case 'Escape': if (settings.focus) update({ focus: false }); else setSideOpen(false); break;
@@ -215,7 +242,7 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
   };
 
   const label = entry.number ? `Ch ${entry.number}` : entry.title;
-  const first = pages[0], last = pages[pages.length - 1];
+  const last = pages[pages.length - 1];
   const bookmarked = bmSet.has(page.id);
   const clearFind = () => { const n = new URLSearchParams(sp); n.delete('q'); setSp(n, { replace: true }); };
 
@@ -226,28 +253,33 @@ function ReaderView({ entry, chapter, prev, next }: { entry: CatalogEntry; chapt
           <Link to="/" className="icon-btn" aria-label="Back to library" title="Library"><Icon name="book" /></Link>
           <button className="icon-btn only-narrow" onClick={() => setSideOpen(true)} aria-label="Open outline"><Icon name="list" /></button>
           <div className="r-title">
-            <strong>{label}</strong><span className="t">{entry.number ? entry.title : ''}</span>
-            <span className="pgind" aria-live="polite">p. {page.label}{first.bookPage != null && last.bookPage != null ? ` · ${first.bookPage}–${last.bookPage}` : ''}</span>
+            <strong>{label}</strong>{entry.number ? <span className="t">{entry.title}</span> : null}
           </div>
+          <span className="pgind" aria-live="polite">Page {page.label}{last.bookPage != null && page.bookPage != null ? <span className="muted"> / {last.bookPage}</span> : null}</span>
           {q && <button className="chip" onClick={clearFind} title="Clear search highlights">“{q}” <Icon name="close" size={12} /></button>}
           <div className="grow" />
           <button className="icon-btn" disabled={!prev} onClick={() => prev && nav(`/read/${prev.id}`)} aria-label={prev ? `Previous: ${prev.title}` : 'No previous chapter'} title={prev ? `Previous: ${prev.title}` : ''}><Icon name="left" /></button>
           <button className="icon-btn" disabled={!next} onClick={() => next && nav(`/read/${next.id}`)} aria-label={next ? `Next: ${next.title}` : 'No next chapter'} title={next ? `Next: ${next.title}` : ''}><Icon name="right" /></button>
           <button className="icon-btn" onClick={openSearch} aria-label="Search (Ctrl/⌘ K)" title="Search"><Icon name="search" /></button>
-          <button className="icon-btn" aria-pressed={bookmarked} onClick={() => toggleBm(page)} aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark this page'} title="Bookmark page (B)"><Icon name={bookmarked ? 'bookmarkFill' : 'bookmark'} /></button>
+          <button className="icon-btn" onClick={() => actions.viewOriginal(page.id)} aria-label="View original page" title="View original page"><Icon name="image" /></button>
+          <button className="icon-btn" aria-pressed={bookmarked} onClick={() => toggleBm(page.id)} aria-label={bookmarked ? 'Remove bookmark' : 'Bookmark this page'} title="Bookmark page (B)"><Icon name={bookmarked ? 'bookmarkFill' : 'bookmark'} /></button>
           <button className="icon-btn" data-settings-toggle aria-expanded={setOpen} onClick={() => setSetOpen((v) => !v)} aria-label="Reading comfort" title="Reading comfort"><Icon name="text" /></button>
           <button className="icon-btn" aria-pressed={settings.focus} onClick={() => update({ focus: !settings.focus })} aria-label="Focus mode" title="Focus mode (F)"><Icon name="focus" /></button>
           {setOpen && <ReaderSettings onClose={() => setSetOpen(false)} />}
         </header>
+        {notice && <div className="toast" role="status">{notice}</div>}
         {settings.focus && <button className="btn focus-exit" onClick={() => update({ focus: false })}>Exit focus (Esc)</button>}
         <div className="r-grid">
           <Sidebar chapter={chapter} annos={annos} bookmarks={bookmarks} curHead={curHead} curIdx={curIdx} open={sideOpen} tab={tab} setTab={setTab} onClose={() => setSideOpen(false)} jumpBlock={jumpBlock} jumpPage={jumpPage} jumpAnno={jumpAnno} gotoRef={gotoRef} />
           <main className="r-main" id="main">
             <div className="r-col" ref={col} onClick={onColClick} onKeyDown={onColKey}>
               {entry.number == null || pages[0].kind !== 'chapter_opener' ? <h1 className="doc-title">{entry.title}</h1> : null}
-              {pages.map((p, i) => {
-                const list = annosByPage.get(p.id) ?? [];
-                return <PageSection key={p.id} page={p} idx={i} annos={list} sig={list.map((a) => `${a.id}${a.updated}`).join()} find={findRe} findKey={q} bookmarked={bmSet.has(p.id)} />;
+              {chapter.blocks.map((b) => {
+                const seen = new Set<Annotation>();
+                blockParts(b).forEach((p) => annosByPart.get(`${p.pageId}:${p.pi}`)?.forEach((a) => seen.add(a)));
+                const list = [...seen];
+                const bm = anchorsOf(b).filter((id) => bmSet.has(id)).join();
+                return <BlockRow key={b.key} b={b} annos={list} sig={list.map((a) => `${a.id}${a.updated}`).join()} find={findRe} findKey={q} bm={bm} />;
               })}
               <nav className="chap-nav" aria-label="Chapter navigation">
                 {prev ? <Link to={`/read/${prev.id}`}><small>Previous</small><span>{prev.number ? `${prev.number}. ` : ''}{prev.title}</span></Link> : <span />}

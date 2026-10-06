@@ -41,26 +41,31 @@ export interface CatalogEntry {
 }
 
 /* ───────────── Parsed reader model ───────────── */
-/** A slice of one raw paragraph. `off` = characters stripped from the start (e.g. "• "). */
-export interface Part { pi: number; off: number; text: string }
+/** Emphasis computed at parse time (offsets relative to Part.text). */
+export interface Em { s: number; e: number; k: 'b' | 'i' }
+/**
+ * A slice of one raw paragraph. `off` = characters stripped from the start (e.g. "• ").
+ * `pageStarts`: page anchors (zero-size) placed right before this slice — this is how a paragraph that
+ * runs across a page break stays one paragraph while the page markers stay addressable.
+ */
+export interface Part { pageId: string; pi: number; off: number; text: string; pageStarts?: string[]; em?: Em[] }
 
+interface Base { key: string; pageStarts?: string[] }
 export type Block =
-  | { t: 'hero'; key: string; number: string; title: string }
-  | { t: 'contents'; key: string; lines: string[] }
-  | { t: 'h'; key: string; level: 2 | 3; parts: Part[]; text: string }
-  | { t: 'label'; key: string; parts: Part[] }
-  | { t: 'p'; key: string; parts: Part[]; cont?: boolean }
-  | { t: 'li'; key: string; parts: Part[]; num?: string; cont?: boolean }
-  | { t: 'fig'; key: string; parts: Part[]; figLabel: string; labels: string[] }
-  | { t: 'tcap'; key: string; parts: Part[]; tableId?: string }
-  | { t: 'table'; key: string; rows: string[][]; tableId?: string };
+  | (Base & { t: 'hero'; number: string; title: string })
+  | (Base & { t: 'h'; level: 2 | 3; parts: Part[]; text: string })
+  | (Base & { t: 'label'; parts: Part[] })
+  | (Base & { t: 'p'; parts: Part[]; cont?: boolean })
+  | (Base & { t: 'li'; parts: Part[]; num?: string; cont?: boolean })
+  | (Base & { t: 'fig'; parts: Part[]; figLabel: string; figId: string })
+  | (Base & { t: 'tcap'; parts: Part[]; tableId?: string })
+  | (Base & { t: 'table'; rows: string[][]; tableId?: string });
 
-export interface ParsedPage {
-  id: string; pdfPage: number; bookPage: number | null; label: string; kind: PageKind; blocks: Block[];
-}
+/** Page metadata only; text lives in ParsedChapter.blocks (one continuous flow). */
+export interface ParsedPage { id: string; pdfPage: number; bookPage: number | null; label: string; kind: PageKind }
 export interface OutlineItem { key: string; text: string; level: 2 | 3; pageId: string; pageIdx: number; label: string }
 export interface ParsedChapter {
-  id: ChapterId; number: number | null; title: string; pages: ParsedPage[]; outline: OutlineItem[];
+  id: ChapterId; number: number | null; title: string; pages: ParsedPage[]; blocks: Block[]; outline: OutlineItem[];
 }
 
 /* ───────────── User data (IndexedDB) ───────────── */

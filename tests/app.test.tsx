@@ -17,7 +17,7 @@ it('opens a chapter from the hash route and finishes loading', async () => {
   window.location.hash = '#/read/ch03';
   const { default: App } = await import('../src/App');
   render(<App />);
-  await waitFor(() => expect(document.querySelectorAll('section.page').length).toBeGreaterThan(0), { timeout: 8000 }).catch(() => {});
+  await waitFor(() => expect(document.querySelectorAll('span.pg-anchor[data-page]').length).toBeGreaterThan(0), { timeout: 8000 }).catch(() => {});
   console.log('BODY:', document.body.textContent?.slice(0, 300));
-  expect(document.querySelectorAll('section.page').length).toBe(36);
+  expect(document.querySelectorAll('span.pg-anchor[data-page]').length).toBe(36);
 }, 20000);
