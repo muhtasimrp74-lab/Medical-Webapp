@@ -33,13 +33,13 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: ({ url }) => /\/data\/(chapters\/ch\d+|index|front_matter|back_matter)\.json$/.test(url.pathname),
-            handler: 'CacheFirst',
-            options: { cacheName: 'chapters-v1', expiration: { maxEntries: 40 }, cacheableResponse: { statuses: [0, 200] } },
+            handler: 'NetworkFirst',
+            options: { cacheName: 'chapters-v2', networkTimeoutSeconds: 8, cacheableResponse: { statuses: [200] } },
           },
           {
             urlPattern: ({ url }) => /\/pages\/\d+\.webp$/.test(url.pathname),
             handler: 'CacheFirst',
-            options: { cacheName: 'page-images-v1', expiration: { maxEntries: 400 }, cacheableResponse: { statuses: [200] } },
+            options: { cacheName: 'page-images-v1', cacheableResponse: { statuses: [200] } },
           },
         ],
       },

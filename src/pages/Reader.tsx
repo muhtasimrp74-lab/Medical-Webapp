@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { loadCatalog, loadChapter } from '../lib/data';
+import { loadCatalog, loadChapter, resetOfflineCache } from '../lib/data';
 import { getProgress, listAnnotations, listBookmarks, putAnnotation, deleteAnnotation, toggleBookmark, uid, updateProgress, useLive, requestPersistence } from '../lib/db';
 import { useSettings } from '../lib/settings';
 import { buildFindRegex } from '../lib/segments';
@@ -24,6 +24,8 @@ export default function Reader() {
   const [chapter, setChapter] = useState<ParsedChapter | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [slow, setSlow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setSlow(true), 8000); return () => clearTimeout(t); }, [chapterId, attempt]);
   useEffect(() => { loadCatalog().then(setCatalog).catch((e) => setError(e.message)); }, [attempt]);
   const idx = catalog ? catalog.findIndex((e) => e.id === chapterId) : -1;
   const entry = catalog?.[idx];
@@ -37,7 +39,14 @@ export default function Reader() {
 
   if (error) return (<main className="center-msg"><h1>Couldn’t load this chapter</h1><p className="muted">{error}. You may be offline and haven’t read this chapter yet.</p><button className="btn primary" onClick={() => setAttempt((n) => n + 1)}>Try again</button> <Link className="btn" to="/">Library</Link></main>);
   if (catalog && !entry) return (<main className="center-msg"><h1>Chapter not found</h1><Link className="btn primary" to="/">Back to library</Link></main>);
-  if (!entry || !chapter) return (<main className="center-msg" aria-busy="true"><p className="muted">Loading chapter…</p></main>);
+  if (!entry || !chapter) return (
+    <main className="center-msg" aria-busy="true">
+      <p className="muted">Loading chapter…</p>
+      {slow && (<>
+        <p className="muted">This is taking longer than expected. Check your connection, or clear the offline cache and retry.</p>
+        <button className="btn primary" onClick={() => setAttempt((n) => n + 1)}>Retry</button> <button className="btn" onClick={resetOfflineCache}>Reset offline cache</button>
+      </>)}
+    </main>);
   return <ReaderView key={entry.id} entry={entry} chapter={chapter} prev={catalog![idx - 1]} next={catalog![idx + 1]} />;
 }
 

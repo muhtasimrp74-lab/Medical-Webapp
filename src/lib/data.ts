@@ -8,9 +8,23 @@ export const dataUrl = (path: string) => `${appBase()}data/${path}`;
 export const pageImageUrl = (pdfPage: number) => `${appBase()}pages/${pdfPage}.webp`;
 
 async function getJson<T>(path: string): Promise<T> {
-  const res = await fetch(dataUrl(path));
-  if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`);
-  return res.json() as Promise<T>;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 45000);
+  try {
+    const res = await fetch(dataUrl(path), { signal: ctl.signal });
+    if (!res.ok) throw new Error(`Could not load ${path} (HTTP ${res.status})`);
+    return (await res.json()) as T;
+  } catch (e) {
+    if ((e as Error).name === 'AbortError') throw new Error(`Timed out loading ${path}`);
+    throw e;
+  } finally { clearTimeout(timer); }
+}
+
+/** Escape hatch: unregister the service worker and clear its caches, then reload. */
+export async function resetOfflineCache() {
+  try { (await navigator.serviceWorker?.getRegistrations())?.forEach((r) => r.unregister()); } catch { /* ignore */ }
+  try { for (const k of await caches.keys()) await caches.delete(k); } catch { /* ignore */ }
+  location.reload();
 }
 
 let catalogP: Promise<CatalogEntry[]> | null = null;
